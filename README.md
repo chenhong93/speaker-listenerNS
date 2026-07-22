@@ -14,9 +14,7 @@ Getting Started: To build up the project, please follow these steps:
 2. Download Data: Download data from the shared link and save them in 'storyMEG/', resulting in two folders 'storyMEG/SLNS/' and 'storyMEG/res/'
 3. Install MATLAB Toolboxes: Install FieldTrip and mTRF if they are not installed yet.
 
-
-
-
 f2-f5: corresponding to fig 2~fig 5 in the paper
-
+The last code files with 'plot' string can be runned directly with downloaded data to plot figures in the paper.
+Previous code files are used for generating the result files
 
