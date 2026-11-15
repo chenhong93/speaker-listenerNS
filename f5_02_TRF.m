@@ -3,7 +3,7 @@
 
 % TRF parameters
 fs_new = 100;
-lambda = 1000;
+lambda = 1000;%10.^(-5:1:5)
 tmin=-2000;
 tmax=2000;
 trange=[tmin tmax];
@@ -133,7 +133,17 @@ for i=1:22
                 strain_1=cellfun(@(x) squeeze(x(:,chan,:)), strain, 'UniformOutput', false);
                 stest_1=cellfun(@(x) squeeze(x(:,chan,:)), stest, 'UniformOutput', false);
                 % Train
-                model = mTRFtrain(strain_1,rtrain,fs_new,Dir,tmin,tmax,lambda,'zeropad',1,'type','multi','method','ridge');
+                % model = mTRFtrain(strain_1,rtrain,fs_new,Dir,tmin,tmax,lambda,'zeropad',1,'type','multi','method','ridge');
+                if length(lambda)==1
+                    model = mTRFtrain(strain_1,rtrain,fs_new,Dir,tmin,tmax,lambda,'zeropad',1,'type','multi');
+                elseif length(lambda)>1
+                    tempstat = mTRFcrossval(strain_1,rtrain,fs_new,Dir,tmin,tmax,lambda,'zeropad',1,'type','multi');
+                    mr=squeeze(mean(tempstat.r,[1 3]));
+                    ind=find(mr==min(mr));
+                    ind=ind(1);
+                    reallambda=lambda(ind);
+                    model = mTRFtrain(strain_1,rtrain,fs_new,Dir,tmin,tmax,reallambda,'zeropad',1,'type','multi');
+                end
                 % save model
                 modelall{i,s,chan}=model;
                 disp(['****_*****_****' num2str(i) '/22--' num2str(s) '/8--' num2str(chan) '/fea' num2str(fea) '****_*****_****']);

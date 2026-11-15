@@ -3,7 +3,7 @@
 
 % TRF parameters
 fs_new = 100;
-lambda = 10;
+lambda = 10;%10.^(-5:1:5)
 tmin=-500;
 tmax=1000;
 Dir=1;
@@ -15,7 +15,7 @@ for fff=1:6
     % 6 features
     ffall={'acoustic','consonant','vowel','pitch_height','pitch_change','tone'};
     fname=ffall{fff};
-    load([fname '.mat'],'wavfile');
+    load(['SLNS' filesep 'derivatives' filesep 'feature' filesep fname '.mat'],'wavfile');
 
     % prepare result variables
     allcorr={};
@@ -70,8 +70,16 @@ for fff=1:6
             rtest=allmeg(indtest,1);
 
             % Train
-            model = mTRFtrain(strain,rtrain,fs_new,Dir,tmin,tmax,lambda,'zeropad',1,'type','multi');
-
+            if length(lambda)==1
+                model = mTRFtrain(strain,rtrain,fs_new,Dir,tmin,tmax,lambda,'zeropad',1,'type','multi');
+            elseif length(lambda)>1
+                tempstat = mTRFcrossval(strain,rtrain,fs_new,Dir,tmin,tmax,lambda,'zeropad',1,'type','multi');
+                mr=squeeze(mean(tempstat.r,[1 3]));
+                ind=find(mr==min(mr));
+                ind=ind(1);
+                reallambda=lambda(ind);
+                model = mTRFtrain(strain,rtrain,fs_new,Dir,tmin,tmax,reallambda,'zeropad',1,'type','multi');
+            end
             % Test
             [~,test] = mTRFpredict(stest,rtest,model,'zeropad',1);
 
